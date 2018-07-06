@@ -12,11 +12,10 @@
     --name mysql \
     -p 3306:3306 \
     -e MYSQL_ROOT_PASSWORD=123456 \
+    -e MYSQL_DATABASE=demo_oauth2 \
     -d mysql:5.7 \
     --character-set-server=utf8mb4 \
     --collation-server=utf8mb4_unicode_ci \
     --max_connections=500 \
     --max_allowed_packet=5M`
 如果想数据外挂，可以添加如下命令：`-v /demo/mysql/data:/var/lib/mysql `
-创建数据库：
-docker exec mysql sh -c 'exec mysqldump --all-databases -uroot -pcloud123' > /Users/chenyan/tmp/all-databases.sql

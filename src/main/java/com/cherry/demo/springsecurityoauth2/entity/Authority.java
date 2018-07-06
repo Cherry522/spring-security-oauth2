@@ -1,6 +1,7 @@
 package com.cherry.demo.springsecurityoauth2.entity;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -9,6 +10,7 @@ import javax.validation.constraints.Size;
  * @author chenyan
  * @date 下午6:28
  */
+@Entity
 public class Authority {
     @Id
     @Column(updatable = false,nullable = false)
