@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 下午4:01
  */
 @RestController
-@RequestMapping("/hello")
-public class HelloWorldController {
+@RequestMapping("/secure")
+public class SecureController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String sayHello(){
-        return "Hello User!";
+        return "Secure User!";
     }
 }
