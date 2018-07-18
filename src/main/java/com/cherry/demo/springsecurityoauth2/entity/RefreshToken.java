@@ -1,11 +1,7 @@
 package com.cherry.demo.springsecurityoauth2.entity;
 
-import org.apache.catalina.Engine;
-import org.hibernate.dialect.InnoDBStorageEngine;
-
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.io.File;
 
 /**
  * RefreshToken信息表:刷新Token时需要用到refresh_token信息
