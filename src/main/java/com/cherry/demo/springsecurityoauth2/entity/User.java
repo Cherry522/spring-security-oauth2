@@ -36,7 +36,7 @@ public class User {
     @Size(max = 100)
     private String resetPasswordKey;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_authority",
             joinColumns = @JoinColumn(name = "username"),

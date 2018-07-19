@@ -1,5 +1,6 @@
 # spring-security-oauth2
 用于提供RESTful API接口，用SpringBoot + Spring Security + oAuth2实现
+通过
 
 参考链接：
     https://blog.csdn.net/weixin_42033269/article/details/80086422
@@ -22,3 +23,13 @@
     --max_connections=500 \
     --max_allowed_packet=5M`
 如果想数据外挂，可以添加如下命令：`-v /demo/mysql/data:/var/lib/mysql `
+
+OAuth2为我们提供了四种授权方式：
+
+1、授权码模式（authorization code） 
+2、简化模式（implicit） 
+3、密码模式（resource owner password credentials） 
+4、客户端模式（client credentials）
+
+本文用是密码模式：
+密码模式也是比较常用到的一种，客户端向授权服务器提供用户名、密码然后得到授权令牌。这种模式不过有种弊端，我们的客户端需要存储用户输入的密码，但是对于用户来说信任度不高的平台是不可能让他们输入密码的
