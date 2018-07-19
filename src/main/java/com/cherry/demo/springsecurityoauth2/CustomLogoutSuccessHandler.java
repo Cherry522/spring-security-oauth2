@@ -25,7 +25,7 @@ import java.io.IOException;
 public class CustomLogoutSuccessHandler
         extends AbstractAuthenticationTargetUrlRequestHandler implements LogoutSuccessHandler {
 
-    private static final String BEARER_AUTHENTICATION = "Bearer";
+    private static final String BEARER_AUTHENTICATION = "Bearer ";
     private static final String HEADER_AUTHORIZATION = "authorization";
 
 

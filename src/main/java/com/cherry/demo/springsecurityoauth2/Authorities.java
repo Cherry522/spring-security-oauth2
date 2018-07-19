@@ -1,6 +1,7 @@
 package com.cherry.demo.springsecurityoauth2;
 
 /**
+ * 角色
  * Created by IntelliJ IDEA.
  * User: chenyan
  * Date: 2018/7/18

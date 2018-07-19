@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import javax.sql.DataSource;
 
 /**
+ * OAuth2配置
  * @author chenyan
  * @date 下午2:49
  */
@@ -31,13 +32,12 @@ import javax.sql.DataSource;
 public class OAuth2Configuration {
 
     /**
-     * 配置资源服务器
+     * 配置资源服务器，控制哪些资源需要验证后可以访问，哪些资源不需要验证就能访问
      */
     @Configuration
     @EnableResourceServer
     protected static class ResourceServerConfiguration extends ResourceServerConfigurerAdapter{
 
-//        CustomAuthenticationEntryPoint
         @Autowired
         CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
@@ -48,7 +48,7 @@ public class OAuth2Configuration {
         public void configure(HttpSecurity http) throws Exception {
             http.exceptionHandling()
                     .authenticationEntryPoint(customAuthenticationEntryPoint)
-
+                    //定义登出的连接和处理方式
                     .and()
                     .logout()
                     .logoutUrl("/oauth/logout")
@@ -56,8 +56,8 @@ public class OAuth2Configuration {
 
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/hello/").permitAll()
-                    .antMatchers("/secure/**").authenticated();
+                    .antMatchers("/hello/").permitAll()//定义"/hello/"这个资源不需要认证
+                    .antMatchers("/secure/**").authenticated();//定义"/secure/"下的所有资源都需要验证
         }
     }
 
@@ -66,7 +66,7 @@ public class OAuth2Configuration {
      * 开启OAuth2的验证服务器
      */
     @Configuration
-    @EnableAuthorizationServer
+    @EnableAuthorizationServer//开启验证服务器
     protected static class AuthorizationServerConfigurer extends AuthorizationServerConfigurerAdapter implements EnvironmentAware {
         private static final String ENV_OAUTH = "authentication.oauth.";
         private static final String PROP_CLIENTID = "clientid";

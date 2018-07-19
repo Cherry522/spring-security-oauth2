@@ -22,7 +22,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
+        //预认证入口点被调用。拒绝访问。
         log.info("Pre-authenticated entry point called.Rejecting access.");
+        //返回错误码为401
+        //错误信息为：Accesss Denied!
         httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Accesss Denied!");
     }
 }
