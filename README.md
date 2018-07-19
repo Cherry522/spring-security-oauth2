@@ -1,7 +1,7 @@
 # spring-security-oauth2
 用于提供RESTful API接口，用SpringBoot + Spring Security + oAuth2实现
-##数据库准备：  
-###从阿里镜像库下载官方镜像：
+##数据库准备
+###从阿里镜像库下载官方镜像
     `docker pull mysql:5.7`
 ###在服务器上运行mysql容器
 （如果想开机启动可以将`-rm`替换成：`--restart=always`）<br>
