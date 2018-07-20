@@ -63,11 +63,12 @@ public class OAuth2Configuration {
 
 
     /**
-     * 开启OAuth2的验证服务器
+     * 配置OAuth2.0 授权服务机制
      */
     @Configuration
     @EnableAuthorizationServer//开启验证服务器
     protected static class AuthorizationServerConfigurer extends AuthorizationServerConfigurerAdapter implements EnvironmentAware {
+        //从配置文件中读取属性的key
         private static final String ENV_OAUTH = "authentication.oauth.";
         private static final String PROP_CLIENTID = "clientid";
         private static final String PROP_SECRET = "secret";
@@ -80,6 +81,16 @@ public class OAuth2Configuration {
         private DataSource dataSource;
 
         /**
+         * 管理令牌（Managing Token）：
+         * AuthorizationServerTokenServices 接口定义了一些操作使得你可以对令牌进行一些必要的管理，在使用这些操作的时候请注意以下几点：
+         * 当一个令牌被创建了，你必须对其进行保存，这样当一个客户端使用这个令牌对资源服务进行请求的时候才能够引用这个令牌。
+         * 当一个令牌是有效的时候，它可以被用来加载身份信息，里面包含了这个令牌的相关权限。
+         *
+         * 当你自己创建 AuthorizationServerTokenServices 这个接口的实现时，你可能需要考虑一下使用 DefaultTokenServices 这个类，里面包含了一些有用实现，你可以使用它来修改令牌的格式和令牌的存储。默认的，当它尝试创建一个令牌的时候，是使用随机值来进行填充的，除了持久化令牌是委托一个 TokenStore 接口来实现以外，这个类几乎帮你做了所有的事情。并且 TokenStore 这个接口有一个默认的实现，它就是 InMemoryTokenStore ，如其命名，所有的令牌是被保存在了内存中。除了使用这个类以外，你还可以使用一些其他的预定义实现，下面有几个版本，它们都实现了TokenStore接口：
+         * InMemoryTokenStore：这个版本的实现是被默认采用的，它可以完美的工作在单服务器上（即访问并发量压力不大的情况下，并且它在失败的时候不会进行备份），大多数的项目都可以使用这个版本的实现来进行尝试，你可以在开发的时候使用它来进行管理，因为不会被保存到磁盘中，所以更易于调试。
+         * JdbcTokenStore：这是一个基于JDBC的实现版本，令牌会被保存进关系型数据库。使用这个版本的实现时，你可以在不同的服务器之间共享令牌信息，使用这个版本的时候请注意把"spring-jdbc"这个依赖加入到你的classpath当中。
+         * JwtTokenStore：这个版本的全称是 JSON Web Token（JWT），它可以把令牌相关的数据进行编码（因此对于后端服务来说，它不需要进行存储，这将是一个重大优势），但是它有一个缺点，那就是撤销一个已经授权令牌将会非常困难，所以它通常用来处理一个生命周期较短的令牌以及撤销刷新令牌（refresh_token）。另外一个缺点就是这个令牌占用的空间会比较大，如果你加入了比较多用户凭证信息。JwtTokenStore 不会保存任何数据，但是它在转换令牌值以及授权信息方面与 DefaultTokenServices 所扮演的角色是一样的。
+         *
          * 定义的JdbcStore来操作数据库中的Token
          * @return
          */
@@ -92,12 +103,41 @@ public class OAuth2Configuration {
         @Qualifier("authenticationManager")
         private AuthenticationManager authenticationManager;
 
+        /**
+         * 用来配置授权（authorization）以及令牌（token）的访问端点和令牌服务(token services)。
+         * @param endpoints
+         * @throws Exception
+         */
         @Override
-        public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
             endpoints.tokenStore(tokenStore())
                     .authenticationManager(authenticationManager);
         }
 
+        /**
+         * 用来配置令牌端点(Token Endpoint)的安全约束.
+         * @param security
+         * @throws Exception
+         */
+        @Override
+        public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+            super.configure(security);
+        }
+
+        /**
+         * 配置客户端详情信息（Client Details)：
+         * ClientDetailsServiceConfigurer (AuthorizationServerConfigurer 的一个回调配置项，见上的概述) 能够使用内存或者JDBC来实现客户端详情服务（ClientDetailsService），有几个重要的属性如下列表：
+         * clientId：（必须的）用来标识客户的Id。
+         * secret：（需要值得信任的客户端）客户端安全码，如果有的话。
+         * scope：用来限制客户端的访问范围，如果为空（默认）的话，那么客户端拥有全部的访问范围。
+         * authorizedGrantTypes：此客户端可以使用的授权类型，默认为空。
+         * authorities：此客户端可以使用的权限（基于Spring Security authorities）。
+         *
+         * 客户端详情（Client Details）能够在应用程序运行的时候进行更新，可以通过访问底层的存储服务（例如将客户端详情存储在一个关系数据库的表中，就可以使用 JdbcClientDetailsService）或者通过 ClientDetailsManager 接口（同时你也可以实现 ClientDetailsService 接口）来进行管理。
+         * （译者注：不过我并没有找到 ClientDetailsManager 这个接口文件，只找到了 ClientDetailsService）
+         * @param clients
+         * @throws Exception
+         */
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
             clients
