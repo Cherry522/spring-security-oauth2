@@ -19,6 +19,9 @@ OAuth2.0是OAuth协议的延续版本，但不向后兼容OAuth 1.0即完全废�
 本文用是密码模式：
 >密码模式也是比较常用到的一种，客户端向授权服务器提供用户名、密码然后得到授权令牌。这种模式不过有种弊端，我们的客户端需要存储用户输入的密码，但是对于用户来说信任度不高的平台是不可能让他们输入密码的
 
+#### OAuth2资料：
+    Spring Security OAuth2 开发指南官方文档翻译:http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html</br>
+    阮一峰理解OAuth 2.0：https://www.cnblogs.com/xingxueliao/p/5911292.html</br>
 
 ## 数据库准备
 ### 从阿里镜像库下载官方镜像
