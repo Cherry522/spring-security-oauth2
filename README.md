@@ -4,7 +4,7 @@
 ## 名词说明
 ### OAuth2.0
 OAuth2.0是OAuth协议的延续版本，但不向后兼容OAuth 1.0即完全废止了OAuth1.0。 OAuth 2.0关注客户端开发者的简易性。要么通过组织在资源拥有者和HTTP服务商之间的被批准的交互动作代表用户，要么允许第三方应用代表用户获得访问的权限。同时为Web应用，桌面应用和手机，和起居室设备提供专门的认证流程。2012年10月，OAuth 2.0协议正式发布为RFC 6749.<br/> 
-具体学习OAuth2.0可以参考官网，也可以参考阮一峰的博客：http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html 
+
 #### OAuth2.0里的Role：
 >Client：可以理解成一个app，需要访问用户资源完成业务逻辑。
 >Authorization server：授权服务器。主要用来向clients颁发access token并校验token有效性。
@@ -20,8 +20,8 @@ OAuth2.0是OAuth协议的延续版本，但不向后兼容OAuth 1.0即完全废�
 >密码模式也是比较常用到的一种，客户端向授权服务器提供用户名、密码然后得到授权令牌。这种模式不过有种弊端，我们的客户端需要存储用户输入的密码，但是对于用户来说信任度不高的平台是不可能让他们输入密码的
 
 #### OAuth2资料：
-    Spring Security OAuth2 开发指南官方文档翻译:http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html</br>
-    阮一峰理解OAuth 2.0：https://www.cnblogs.com/xingxueliao/p/5911292.html</br>
+ Spring Security OAuth2 开发指南官方文档翻译:http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html</br>
+ 阮一峰理解OAuth 2.0：https://www.cnblogs.com/xingxueliao/p/5911292.html</br>
 
 ## 数据库准备
 ### 从阿里镜像库下载官方镜像
