@@ -31,6 +31,79 @@ OAuth2.0是OAuth协议的延续版本，但不向后兼容OAuth 1.0即完全废�
 `docker run --rm --name mysql  -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=demo_oauth2 -d mysql:5.7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max_connections=500 --max_allowed_packet=5M`<br>
 如果想数据外挂，可以添加如下命令：`-v /demo/mysql/data:/var/lib/mysql `
 
+### 测试
+可以通过postman测试</br>
+    
+    访问地址，GET请求：
+    http://127.0.0.1:8080/hello
+    返回:
+    Hello User!
+    
+    结果分析：
+        因为我们定义"/hello/"这个资源不需要认证。
+</br>
+
+    访问地址，GET请求：
+    http://127.0.0.1:8080/secure
+    报错，返回：
+    {
+        "timestamp": 1532498438423,
+        "status": 401,
+        "error": "Unauthorized",
+        "message": "Accesss Denied!",
+        "path": "/secure"
+    }
+    结果分析：
+    返回的结果是我们在类CustomAuthenticationEntryPoint里定义好的错误信息，因为我们定义"/secure/"下的所有资源都需要验证
+</br>
+    
+    执行认证，获取对应的token，POST请求：
+    http://127.0.0.1:8080/oauth/token
+    需要在Basic Auth里输入Username为配置文件application.properties中配置的authentication.oauth.clientid的值：yuqiyu_home_pc
+                     恕瑞玛Password为配置文件application.properties中authentication.oauth.secret的值：yuqiyu_secret
+                     然后点击Refresh heanders按钮
+    加入参数：
+        username为admin
+        password为admin
+        grant_type为password
+        这些参数从数据库中获取
+    返回：
+    {
+        "access_token": "d1f9cb70-08f3-4dff-a5ab-e71af80af843",
+        "token_type": "bearer",
+        "refresh_token": "380a2e78-f4ba-4113-82fc-16a03401ca4c",
+        "expires_in": 1799,
+        "scope": "read write"
+    }
+    结果分析：
+    认证通过后，返回这些信息，这些信息是我们之前在程序里定义好的
+    认证通过后，可以拿着access_token和refresh_token去访问受保护的资源了。
+        127.0.0.1:8080/secure?access_token=d1f9cb70-08f3-4dff-a5ab-e71af80af843
+    
+</br>
+    
+    刷新token，POST请求：
+    127.0.0.1:8080/oauth/token?grant_type=refresh_token&refresh_token=380a2e78-f4ba-4113-82fc-16a03401ca4c
+    需要在Basic Auth里输入Username为配置文件application.properties中配置的authentication.oauth.clientid的值：yuqiyu_home_pc
+                     恕瑞玛Password为配置文件application.properties中authentication.oauth.secret的值：yuqiyu_secret
+                     然后点击Refresh heanders按钮
+    加入参数：
+        grant_type为refresh_token
+        refresh_token为380a2e78-f4ba-4113-82fc-16a03401ca4c
+        这些参数从数据库中获取
+    返回：
+    {
+        "access_token": "4a05c111-cc9c-4e63-a7ad-ecee7ccd6153",
+        "token_type": "bearer",
+        "refresh_token": "380a2e78-f4ba-4113-82fc-16a03401ca4c",
+        "expires_in": 1799,
+        "scope": "read write"
+    }
+    结果分析：
+    刷新认证通后，返回这些信息，这些信息是我们之前在程序里定义好的
+    认证通过后，可以拿着access_token去访问受保护的资源了。
+        127.0.0.1:8080/secure?access_token=d1f9cb70-08f3-4dff-a5ab-e71af80af843
+    
 
 
 ## 参考链接
