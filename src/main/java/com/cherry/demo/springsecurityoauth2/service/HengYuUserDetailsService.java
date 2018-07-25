@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
+ * 配置 Spring Security 来声明系统中的合法用户及其对应的权限
+ * 用户相关的信息是通过org.springframework.security.core.userdetails.UserDetailsService 接口来加载的。
+ * 该接口的唯一方法是loadUserByUsername(String username)，用来根据用户名加载相关的信息。
  * @author chenyan
  * @date 上午11:09
  */
@@ -24,6 +27,15 @@ public class HengYuUserDetailsService implements UserDetailsService {
     @Autowired
     UserJPA userJPA;
 
+    /**
+     * 这个方法的返回值是org.springframework.security.core.userdetails.UserDetails 接口，
+     * 其中包含了用户的信息，包括用户名、密码、权限、是否启用、是否被锁定、是否过期等。
+     * 其中最重要的是用户权限，由 org.springframework.security.core.GrantedAuthority 接口来表示。
+     * 虽然 Spring Security 内部的设计和实现比较复杂，但是一般情况下，开发人员只需要使用它默认提供的实现就可以满足绝大多数情况下的需求，而且只需要简单的配置声明即可。
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //从数据库读取用户
