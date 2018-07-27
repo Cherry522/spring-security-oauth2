@@ -113,3 +113,7 @@ OAuth2.0是OAuth协议的延续版本，但不向后兼容OAuth 1.0即完全废�
 
 原作者代码参考：
     https://gitee.com/hengboy/spring-boot-chapter
+    
+    
+ClientDetailsServiceConfigurer 用jdbc方式，默认是inMemory方式    
+https://stackoverflow.com/questions/35039656/how-to-add-a-client-using-jdbc-for-clientdetailsserviceconfigurer-in-spring
