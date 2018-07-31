@@ -58,9 +58,12 @@ OAuth2.0是OAuth协议的延续版本，但不向后兼容OAuth 1.0即完全废�
 </br>
     
     执行认证，获取对应的token，POST请求：
+    用curl测试：
+    curl -X POST -u client:secret -d 'grant_type=password&username=admin&password=admin' 'http://127.0.0.1:8080/oauth/token'
+    
     http://127.0.0.1:8080/oauth/token
-    需要在Basic Auth里输入Username为配置文件application.properties中配置的authentication.oauth.clientid的值：yuqiyu_home_pc
-                     恕瑞玛Password为配置文件application.properties中authentication.oauth.secret的值：yuqiyu_secret
+    需要在Basic Auth里输入Username为ClientDetailsServiceConfigurer里配置的withClient的值：client
+                     输入Password为ClientDetailsServiceConfigurer里配置的secret的值：secret
                      然后点击Refresh heanders按钮
     加入参数：
         username为admin
