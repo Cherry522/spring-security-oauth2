@@ -22,7 +22,7 @@ import java.util.Collection;
  * @date 上午11:09
  */
 @Service("userDetailsService")
-public class HengYuUserDetailsService implements UserDetailsService {
+public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
     UserJPA userJPA;
@@ -56,5 +56,10 @@ public class HengYuUserDetailsService implements UserDetailsService {
                 user.getUsername(),
                 user.getPassword(),
                 grantedAuthorities);
+
+//        return new org.springframework.security.core.userdetails.User(
+//                user.getUsername(),
+//                user.getPassword(),
+//                user.getAuthorities());
     }
 }

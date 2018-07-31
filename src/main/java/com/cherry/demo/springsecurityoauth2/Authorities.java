@@ -1,7 +1,7 @@
 package com.cherry.demo.springsecurityoauth2;
 
 /**
- * 角色
+ * 角色的枚举类型，对应Authority表里的值
  * Created by IntelliJ IDEA.
  * User: chenyan
  * Date: 2018/7/18

@@ -1,5 +1,6 @@
 package com.cherry.demo.springsecurityoauth2;
 
+import com.cherry.demo.springsecurityoauth2.service.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -16,15 +18,28 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import javax.sql.DataSource;
+import java.util.concurrent.TimeUnit;
 
 /**
  * OAuth2配置
+ * OAuth 2 标准中定义了以下几种角色：
+ * 资源所有者（Resource Owner）
+ * 资源服务器（Resource Server）
+ * 授权服务器（Authorization Server）
+ * 客户端（Client）
+ * 这里主要配置资源服务器和授权服务器，一般情况下这两个是分开的，这里为了测试方便，我们先写到一起。
  * @author chenyan
  * @date 下午2:49
  */
@@ -76,6 +91,15 @@ public class OAuth2Configuration {
 
         private RelaxedPropertyResolver propertyResolver;
 
+        @Autowired
+        private MyUserDetailsService userDetailsService;
+
+        /**
+         * 认证管理器，当你选择了资源所有者密码（password）授权类型的时候，请设置这个属性注入一个 AuthenticationManager 对象。
+         */
+        @Autowired
+        @Qualifier("authenticationManager")
+        private AuthenticationManager authenticationManager;
 
         @Autowired
         private DataSource dataSource;
@@ -99,12 +123,15 @@ public class OAuth2Configuration {
             return new JdbcTokenStore(dataSource);
         }
 
-        /**
-         * 认证管理器，当你选择了资源所有者密码（password）授权类型的时候，请设置这个属性注入一个 AuthenticationManager 对象。
-         */
-        @Autowired
-        @Qualifier("authenticationManager")
-        private AuthenticationManager authenticationManager;
+        @Bean
+        public JdbcClientDetailsService jdbcClientDetailsService(){
+            return new JdbcClientDetailsService(dataSource);
+        }
+
+//        @Bean
+//        public AuthenticationManager authenticationManager(){
+//            return new OAuth2AuthenticationManager();
+//        }
 
         /**
          * 用来配置授权（authorization）以及令牌（token）的访问端点和令牌服务(token services)。
@@ -122,6 +149,33 @@ public class OAuth2Configuration {
          */
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+//            //数据库保存token
+//            endpoints.authenticationManager(authenticationManager);
+//            endpoints.tokenStore(tokenStore());
+//
+////            //redis报错token
+////            endpoints.tokenStore(new RedisTokenStore(redisConnectionFactory));
+////            endpoints.authenticationManager(authenticationManager);   // redis保存token
+//
+//            // 配置TokenServices参数
+//            DefaultTokenServices tokenServices = new DefaultTokenServices();
+//            tokenServices.setTokenStore(endpoints.getTokenStore());
+//            tokenServices.setSupportRefreshToken(false);
+//            tokenServices.setClientDetailsService(endpoints.getClientDetailsService());
+//            tokenServices.setTokenEnhancer(endpoints.getTokenEnhancer());
+//            tokenServices.setAccessTokenValiditySeconds( (int) TimeUnit.DAYS.toSeconds(30)); // 30天
+//            endpoints.tokenServices(tokenServices);
+
+//            endpoints
+//                    .authenticationManager(authenticationManager)
+//                    .approvalStoreDisabled()
+//                    .userDetailsService(userDetailsService);
+
+//            endpoints.userDetailsService(userDetailsService)
+//                    .authenticationManager(this.authenticationManager())
+//                    .tokenStore(tokenStore())
+//                    .approvalStoreDisabled();
+
             endpoints.tokenStore(tokenStore())
                     //认证管理器，当你选择了资源所有者密码（password）授权类型的时候，请设置这个属性注入一个 AuthenticationManager 对象。
                     .authenticationManager(authenticationManager)
@@ -148,6 +202,9 @@ public class OAuth2Configuration {
         @Override
         public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
             super.configure(security);
+
+//            security.tokenKeyAccess("isAnonymous() || hasAuthority('ROLE_TRUSTED_CLIENT')");
+//            security.checkTokenAccess("hasAuthority('ROLE_TRUSTED_CLIENT')");
         }
 
         /**
@@ -166,20 +223,38 @@ public class OAuth2Configuration {
          */
         @Override
         public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-            clients
-                    .inMemory()
-                    .withClient(propertyResolver.getProperty(PROP_CLIENTID))
-                    .scopes("read", "write")
-                    .authorities(Authorities.ROLE_ADMIN.name(), Authorities.ROLE_USER.name())
-                    //authorizedGrantTypes可以取值：
-                    //authorization_code：授权码类型。
-                    //implicit：隐式授权类型。
-                    //password：资源所有者（即用户）密码类型。
-                    //client_credentials：客户端凭据（客户端ID以及Key）类型。
-                    //refresh_token：通过以上授权获得的刷新令牌来获取新的令牌。
-                    .authorizedGrantTypes("password", "refresh_token")
-                    .secret(propertyResolver.getProperty(PROP_SECRET))
-                    .accessTokenValiditySeconds(propertyResolver.getProperty(PROP_TOKEN_VALIDITY_SECONDS, Integer.class, 1800));
+
+            ////默认值InMemoryTokenStore对于单个服务器是完全正常的（即，在发生故障的情况下，低流量和热备份备份服务器）。大多数项目可以从这里开始，也可以在开发模式下运行，以便轻松启动没有依赖关系的服务器。
+            //这JdbcTokenStore是同一件事的JDBC版本，它将令牌数据存储在关系数据库中。如果您可以在服务器之间共享数据库，则可以使用JDBC版本，如果只有一个，则扩展同一服务器的实例，或者如果有多个组件，则授权和资源服务器。要使用JdbcTokenStore你需要“spring-jdbc”的类路径。
+
+
+            clients.withClientDetails(jdbcClientDetailsService());
+            //在项目启动的时候，会在oauth_clients_details表中添加一条数据
+//            clients.jdbc(dataSource)
+//                    .withClient("clientid")
+//                    .authorizedGrantTypes("password", "refresh_token")
+//                    .authorities(Authorities.ROLE_USER.name())
+//                    .scopes("read", "write")
+////                    .resourceIds("RESOURCE_ID")
+//                    .secret("123456")
+//                    .and().build()
+//            ;
+
+
+//            clients
+//                    .inMemory()
+//                    .withClient(propertyResolver.getProperty(PROP_CLIENTID))
+//                    .scopes("read", "write")
+//                    .authorities(Authorities.ROLE_ADMIN.name(), Authorities.ROLE_USER.name())
+//                    //authorizedGrantTypes可以取值：
+//                    //authorization_code：授权码类型。
+//                    //implicit：隐式授权类型。
+//                    //password：资源所有者（即用户）密码类型。
+//                    //client_credentials：客户端凭据（客户端ID以及Key）类型。
+//                    //refresh_token：通过以上授权获得的刷新令牌来获取新的令牌。
+//                    .authorizedGrantTypes("password", "refresh_token")
+//                    .secret(propertyResolver.getProperty(PROP_SECRET))
+//                    .accessTokenValiditySeconds(propertyResolver.getProperty(PROP_TOKEN_VALIDITY_SECONDS, Integer.class, 1800));
         }
 
         @Override

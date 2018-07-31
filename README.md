@@ -105,6 +105,9 @@ OAuth2.0是OAuth协议的延续版本，但不向后兼容OAuth 1.0即完全废�
         127.0.0.1:8080/secure?access_token=d1f9cb70-08f3-4dff-a5ab-e71af80af843
     
 
+对于各个表及字段的解释：
+http://andaily.com/spring-oauth-server/db_table_description.html
+
 
 ## 参考链接
 .md2语法使用参考：https://blog.csdn.net/ljc_563812704/article/details/53464039

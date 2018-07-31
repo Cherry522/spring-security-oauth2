@@ -4,7 +4,10 @@
 -- 其次，语句中会有某些字段为LONGVARBINARY类型，它对应mysql的blob类型，也需要修改一下。
 -- 下面的脚本是修改过后的脚本
 
+-- 数据库中各个表和字段说明：http://andaily.com/spring-oauth-server/db_table_description.html
+
 -- used in tests that use HSQL
+DROP TABLE IF EXISTS oauth_client_details;
 create table oauth_client_details (
   client_id VARCHAR(255) PRIMARY KEY,
   resource_ids VARCHAR(255),
@@ -19,6 +22,7 @@ create table oauth_client_details (
   autoapprove VARCHAR(255)
 );
 
+DROP TABLE IF EXISTS oauth_client_token;
 create table oauth_client_token (
   token_id VARCHAR(255),
   token blob,
@@ -27,6 +31,7 @@ create table oauth_client_token (
   client_id VARCHAR(255)
 );
 
+DROP TABLE IF EXISTS oauth_access_token;
 create table oauth_access_token (
   token_id VARCHAR(255),
   token blob,
@@ -37,16 +42,19 @@ create table oauth_access_token (
   refresh_token VARCHAR(255)
 );
 
+DROP TABLE IF EXISTS oauth_refresh_token;
 create table oauth_refresh_token (
   token_id VARCHAR(255),
   token blob,
   authentication blob
 );
 
+DROP TABLE IF EXISTS oauth_code;
 create table oauth_code (
   code VARCHAR(255), authentication blob
 );
 
+DROP TABLE IF EXISTS oauth_approvals;
 create table oauth_approvals (
 	userId VARCHAR(255),
 	clientId VARCHAR(255),
@@ -71,3 +79,12 @@ create table oauth_approvals (
 --   additionalInformation VARCHAR(255),
 --   autoApproveScopes VARCHAR(255)
 -- );
+
+-- 插入初始化的数据
+insert into `oauth_client_details`
+( `client_id`, `resource_ids`, `client_secret`, `scope`, `authorized_grant_types`, `web_server_redirect_uri`, `authorities`, `access_token_validity`, `refresh_token_validity`, `additional_information`, `autoapprove`)
+values
+( 'clientid', null, 'secret', 'read,write', 'password,refresh_token', '', '', null, null, '{}', '');
+
+-- 这样的话可以通过如下请求获取token信息
+-- curl -X POST -u clientid:secret -d "grant_type=password&username=admin&password=admin" 'http://localhost:10000/oauth2/oauth/token'
