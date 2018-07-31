@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
@@ -89,6 +90,7 @@ public class OAuth2Configuration {
          */
         @Bean
         public TokenStore tokenStore() {
+            //可以用redis存储(RedisTokenStore)或者用数据库存储(JdbcTokenStore)，这里用数据库方式，如果用数据库方式存储会
             return new JdbcTokenStore(dataSource);
         }
 
@@ -116,7 +118,7 @@ public class OAuth2Configuration {
          */
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
-            endpoints.tokenStore(tokenStore())
+            endpoints.tokenStore(tokenStore())//配置token的存储方式，可以用redis存储(RedisTokenStore)或者用数据库存储(JdbcTokenStore)
                     //认证管理器，当你选择了资源所有者密码（password）授权类型的时候，请设置这个属性注入一个 AuthenticationManager 对象。
                     .authenticationManager(authenticationManager)
             //配置授权端点的URL（Endpoint URLs）：
