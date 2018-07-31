@@ -22,12 +22,13 @@ import java.util.Collection;
  * @date 上午11:09
  */
 @Service("userDetailsService")
-public class HengYuUserDetailsService implements UserDetailsService {
+public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
     UserJPA userJPA;
 
     /**
+     * 重写UserDetailsService里的loadUserByUsername(String username)方法，来实现从数据库获取用户信息
      * 这个方法的返回值是org.springframework.security.core.userdetails.UserDetails 接口，
      * 其中包含了用户的信息，包括用户名、密码、权限、是否启用、是否被锁定、是否过期等。
      * 其中最重要的是用户权限，由 org.springframework.security.core.GrantedAuthority 接口来表示。

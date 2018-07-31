@@ -12,6 +12,11 @@ import org.springframework.data.repository.query.Param;
  */
 public interface UserJPA extends JpaRepository<User,String> {
 
+    /**
+     * 根据用户名获取用户数据，用户名忽略大小写
+     * @param username
+     * @return
+     */
     @Query("SELECT u FROM User u WHERE LOWER(username) = LOWER(:username)")
     User findByUsernameCaseInsensitive(@Param("username")String username);
 }
