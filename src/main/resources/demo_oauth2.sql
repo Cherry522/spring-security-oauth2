@@ -36,6 +36,7 @@ INSERT INTO `user` VALUES ('admin', 'admin@mail.me', 'b8f57d6d6ec0a60dfe2e20182d
 INSERT INTO `user` VALUES ('user', 'user@mail.me', 'd6dfa9ff45e03b161e7f680f35d90d5ef51d243c2a8285aa7e11247bc2c92acde0c2bb626b1fac74', '1', null, null);
 INSERT INTO `user` VALUES ('cherry', 'cherry@abc.com', 'd6dfa9ff45e03b161e7f680f35d90d5ef51d243c2a8285aa7e11247bc2c92acde0c2bb626b1fac74', '1', null, null);
 
+
 -- ----------------------------
 -- Table structure for user_authority
 -- ----------------------------
@@ -56,6 +57,7 @@ INSERT INTO `user_authority` VALUES ('cherry', 'ROLE_USER');
 INSERT INTO `user_authority` VALUES ('user', 'ROLE_USER');
 
 
+-- Token存储方式为JdbcTokenStore的时候，要求创建oauth_access_token和oauth_refresh_token两个表 - start
 -- ----------------------------
 -- Table structure for oauth_access_token
 -- ----------------------------
@@ -87,3 +89,4 @@ CREATE TABLE `oauth_refresh_token` (
 -- ----------------------------
 -- Records of oauth_refresh_token
 -- ----------------------------
+-- Token存储方式为JdbcTokenStore的时候，要求创建oauth_access_token和oauth_refresh_token两个表 - end

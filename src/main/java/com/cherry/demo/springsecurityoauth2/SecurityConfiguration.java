@@ -44,8 +44,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     //配置全局设置
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        //设置userDetailsService 和 密码规则
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).//设置userDetailsService
+                passwordEncoder(passwordEncoder());//设置密码规则
     }
 
     /**

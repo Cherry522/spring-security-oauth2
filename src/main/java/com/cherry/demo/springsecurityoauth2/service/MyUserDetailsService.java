@@ -1,5 +1,6 @@
 package com.cherry.demo.springsecurityoauth2.service;
 
+import com.alibaba.fastjson.JSON;
 import com.cherry.demo.springsecurityoauth2.entity.Authority;
 import com.cherry.demo.springsecurityoauth2.entity.User;
 import com.cherry.demo.springsecurityoauth2.repository.UserJPA;
@@ -9,6 +10,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +29,9 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
     UserJPA userJPA;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     /**
      * 重写UserDetailsService里的loadUserByUsername(String username)方法，来实现从数据库获取用户信息
@@ -57,5 +63,13 @@ public class MyUserDetailsService implements UserDetailsService {
                 user.getUsername(),
                 user.getPassword(),
                 grantedAuthorities);
+    }
+
+    public  User add(User user){
+        String password = passwordEncoder.encode(user.getPassword());
+        user.setPassword(password);
+        User u = userJPA.save(user);
+        JSON.toJSON(u);
+        return u;
     }
 }

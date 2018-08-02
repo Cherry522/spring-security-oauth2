@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * 这个现在貌似不好使，调用/oauth/logout的时候会走这里，但是token匹配一直匹配不上
  * 定义登出配置:登出控制清空accessToken
  * 当我们退出系统时需要访问SpringSecrutiy的logout方法来清空对应的session信息，那我们退出后改用户的access_token还依然存在那就危险了，一旦别人知道该token就可以使用之前登录用户的权限来操作业务。
  * @author chenyan
@@ -25,8 +26,8 @@ import java.io.IOException;
 public class CustomLogoutSuccessHandler
         extends AbstractAuthenticationTargetUrlRequestHandler implements LogoutSuccessHandler {
 
-    private static final String BEARER_AUTHENTICATION = "Bearer ";
-    private static final String HEADER_AUTHORIZATION = "authorization";
+    private static final String BEARER_AUTHENTICATION = "Bearer";
+    private static final String HEADER_AUTHORIZATION = "Authorization";
 
 
     @Autowired
